@@ -331,7 +331,7 @@ export default function App() {
                     handleActive("M/M/1");
                   }}
                 >
-                  M/M/1
+                  M/M/2
                 </li>
                 <li
                   className={`hover:bg-[#394144] flex-1 text-center/ tracking-widest ${
