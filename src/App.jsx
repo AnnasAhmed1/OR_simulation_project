@@ -10,6 +10,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { Collapse } from "@mui/material";
+import SimulationMM1Priority from "./SimulationMM1Priority";
 
 export function factorialIterative(n) {
   let result = 1;
@@ -59,6 +60,7 @@ export default function App() {
   const [randomData, setRandomData] = useState([]);
   const [calculatedData, setCalculatedData] = useState([]);
   const [mm1, setMm1] = useState(false);
+  const [mm1Priority, setMm1Priority] = useState(false);
   const [mm2, setMm2] = useState(false);
   const [mg1, setMg1] = useState(false);
   const [mg2, setMg2] = useState(false);
@@ -383,6 +385,16 @@ export default function App() {
                 >
                   G/G/{activeCalculator === "queueing" ? "C" : "2"}
                 </li>
+                <li
+                  className={`hover:bg-[#394144] flex-1 text-center/ tracking-widest ${
+                    active === "G/G/2" ? "bg-[#394144]" : "bg-transparent"
+                  } text-white px-10 border-b py-2 text-lg text-left`}
+                  onClick={() => {
+                    handleActive("M/M/1Priority");
+                  }}
+                >
+                  M/M/1 priority
+                </li>
               </ul>
             </Collapse>
             <h1
@@ -557,10 +569,19 @@ export default function App() {
             <button
               className="bg-[#007BFF] hover:bg-[#0069D9] py-2 px-4 rounded-lg mt-6 text-white text-lg"
               onClick={() => {
+                console.log("button click", active);
                 if (activeCalculator == "simulation") {
                   if (active === "M/M/1") {
                     if (arrivalMean > 0 && serviceMean > 0) {
                       setMm1(!mm1);
+                      scrollToSection("calculationSection");
+                    } else {
+                      notify();
+                    }
+                  } else if (active === "M/M/1Priority") {
+                    console.log("prioority");
+                    if (arrivalMean > 0 && serviceMean > 0) {
+                      setMm1Priority(!mm1Priority);
                       scrollToSection("calculationSection");
                     } else {
                       notify();
@@ -671,6 +692,19 @@ export default function App() {
             <SimulationMM1
               setMm1={setMm1}
               mm1={mm1}
+              setArrivalMean={setArrivalMean}
+              setServiceMean={setServiceMean}
+              arrivalMean={arrivalMean}
+              serviceMean={serviceMean}
+              onClick={() => {
+                scrollToSection("calculatorSection");
+                window.location.reload();
+              }}
+            />
+          ) : active === "M/M/1Priority" ? (
+            <SimulationMM1Priority
+              setMm1={setMm1Priority}
+              mm1={mm1Priority}
               setArrivalMean={setArrivalMean}
               setServiceMean={setServiceMean}
               arrivalMean={arrivalMean}

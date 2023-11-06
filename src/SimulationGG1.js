@@ -137,9 +137,9 @@ const SimulationGG1 = ({
       let value = 0;
       for (let i = 0; i < shape; i++) {
         value -= Math.log(Math.random());
-        // if (val >= 1) {
+        // if (val >= 0.99) {
         //   // break;
-        //   return data.slice(0, -2);
+        //   return data.slice(0, -1);
         // }
       }
       time = Math.round(value * scale);

@@ -30,10 +30,10 @@ const SimulationMM1 = ({
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
-  console.log("annas");
+  // console.log("annas");
 
   useEffect(() => {
-    console.log("useEffect ch");
+    // console.log("useEffect ch");
     //
     const arrivalMeanParam = arrivalMean;
     const serviceMeanParam = serviceMean;
@@ -42,7 +42,7 @@ const SimulationMM1 = ({
       setArrivalMean(arrivalMeanParam);
       setServiceMean(serviceMeanParam);
 
-      const data = generateRandomData(25, arrivalMeanParam, serviceMeanParam);
+      const data = generateRandomData(50, arrivalMeanParam, serviceMeanParam);
       setRandomData(data);
 
       const calculatedData = calculateCalculatedData(data);
@@ -59,7 +59,9 @@ const SimulationMM1 = ({
       const interarrivalTime = Math.round(generateRandomTime(arrivalMean));
       const numerator = Math.exp(-arrivalMean) * Math.pow(arrivalMean, i - 1);
       const denominator = factorialIterative(i - 1);
-      val = val + Math.round((numerator / denominator) * 10000) / 10000;
+      val = val + numerator / denominator;
+
+      console.log(val, "val_chkkk");
       const serviceTime = Math.round(generateRandomTime(serviceMean));
       arrivalTime += interarrivalTime;
       data?.push({
@@ -68,12 +70,13 @@ const SimulationMM1 = ({
         arrivalTime: i === 1 ? 0 : arrivalTime,
         serviceTime: Math.max(1, Math.min(10, serviceTime)), // Ensure value is within 1 to 10 range
       });
-      if (val >= 1) {
+      if (val >= 0.99) {
         // break;
-        return data.slice(0, -2);
+        return data.slice(0, -1);
+        // return data;
       }
     }
-
+    console.log(val);
     return data;
   };
 
@@ -128,21 +131,6 @@ const SimulationMM1 = ({
       const endTime = Math.max(arrivalTime, startTime) + serviceTime;
       const waitTime = Math.max(0, startTime - arrivalTime);
       const turnaroundTime = waitTime + serviceTime;
-      console.log(
-        i +
-          1 +
-          " start time: " +
-          startTime +
-          " endTime: " +
-          endTime +
-          " arrival time: " +
-          arrivalTime +
-          " wait time: " +
-          waitTime +
-          " turnaround: " +
-          turnaroundTime
-      );
-
       calculatedData.push({
         customer,
         interarrivalTime,

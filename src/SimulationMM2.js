@@ -87,7 +87,7 @@ const SimulationMM2 = ({
       const interarrivalTime = Math.round(generateRandomTime(arrivalMean));
       const numerator = Math.exp(-arrivalMean) * Math.pow(arrivalMean, i - 1);
       const denominator = factorialIterative(i - 1);
-      val = val + Math.round((numerator / denominator) * 10000) / 10000;
+      val = val + numerator / denominator;
 
       const serviceTime = Math.round(generateRandomTime(serviceMean));
 
@@ -99,9 +99,9 @@ const SimulationMM2 = ({
         arrivalTime: i === 1 ? 0 : arrivalTime,
         serviceTime: Math.max(1, Math.min(10, serviceTime)), // Ensure value is within 1 to 10 range
       });
-      if (val >= 1) {
+      if (val >= 0.99) {
         // break;
-        return data.slice(0, -2);
+        return data.slice(0, -1);
       }
     }
 

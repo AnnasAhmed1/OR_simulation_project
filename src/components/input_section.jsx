@@ -18,9 +18,9 @@ const InputSection = ({
   servers,
   setServers,
 }) => {
-  console.log(active);
-  console.log(activeCalculator === "queueing");
-  console.log(active.charAt(active.length - 1) == "2");
+  // console.log(active);
+  // console.log(activeCalculator === "queueing");
+  // console.log(active.charAt(active.length - 1) == "2");
   return (
     <div className=" py-2/  px-6/ flex/ flex-col/ gap-2/ h-[55vh]/">
       <h1 className="px-4 py-12 text-3xl border-b mb-12 font-bold  text-center/ font-bold/ text-3xl/ my-1/">
