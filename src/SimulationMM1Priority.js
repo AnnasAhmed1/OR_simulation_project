@@ -180,13 +180,14 @@ const SimulationMM1Priority = ({
           priority3Array.shift();
         } else if (data[i].priority == 2) {
           console.log("priority2");
-
-          if (startTime >= priority3Array[0]?.arrivalTime) {
+          
+          if (data[i].end >= priority3Array[0]?.arrivalTime) {
             console.log("priority23");
             const temp = { ...data[i] };
             temp.end = priority3Array[0].arrivalTime;
             temp.service = temp.end - temp.arrivalTime;
             startTime = startTime + temp.end;
+            console.log(temp, "temp priority23");
             finalData.push(temp);
             let lastinter;
             while (startTime >= priority3Array[0]?.arrivalTime) {
@@ -205,6 +206,7 @@ const SimulationMM1Priority = ({
             temp2.service = temp2.service - temp.service;
             temp2.end = temp2.arrivalTime + temp.service;
             startTime = startTime + temp2.end;
+            console.log(temp2, "temp priority23");
             finalData.push(temp2);
             priority2Array.shift();
           } else {
@@ -217,11 +219,12 @@ const SimulationMM1Priority = ({
           }
         } else if (data[i].priority == 1) {
           console.log("priority1");
-          if (startTime >= priority3Array[0]?.arrivalTime) {
+          if (data[i].end >= priority3Array[0]?.arrivalTime) {
             console.log("priority13");
             const temp = { ...data[i] };
             temp.end = priority3Array[0].arrivalTime;
             temp.service = temp.end - temp.arrivalTime;
+            console.log(temp, "temp priority13");
             finalData.push(temp);
             startTime = startTime + temp.end;
             let lastinter;
@@ -237,8 +240,7 @@ const SimulationMM1Priority = ({
                 );
                 lastinter = priority3Array[0]?.end;
                 priority3Array.shift();
-              }
-              if (startTime >= priority2Array[0]?.arrivalTime) {
+              } else if (startTime >= priority2Array[0]?.arrivalTime) {
                 finalData.push(priority2Array[0]);
                 startTime = startTime + priority2Array[0].end;
                 data = data.filter(
@@ -253,19 +255,21 @@ const SimulationMM1Priority = ({
             const temp2 = { ...data[i] };
             temp2.arrivalTime = lastinter;
             temp2.service = temp2.service - temp.service;
-            temp2.end = temp2.arrivalTime + temp.service;
+            temp2.end = temp2.arrivalTime + temp2.service;
+            console.log(temp2, "temp2 priority23");
             finalData.push(temp2);
             startTime = startTime + temp2.end;
             console.log(priority2Array, "priority2Array before 13");
-            priority2Array.shift();
+            priority1Array.shift();
             console.log(priority2Array, "priority2Array after 13");
 
             // }
-          } else if (startTime >= priority2Array[0]?.arrivalTime) {
+          } else if (data[i].end >= priority2Array[0]?.arrivalTime) {
             console.log("priority12");
             let temp = { ...data[i] };
             temp.end = priority2Array[0]?.arrivalTime;
             temp.service = temp.end - temp.arrivalTime;
+            console.log(temp, "temp priority121111");
             finalData.push(temp);
             startTime = startTime + temp.end;
             let lastinter;
@@ -281,8 +285,7 @@ const SimulationMM1Priority = ({
                 );
                 lastinter = priority3Array[0]?.end;
                 priority3Array.shift();
-              }
-              if (startTime >= priority2Array[0]?.arrivalTime) {
+              } else if (startTime >= priority2Array[0]?.arrivalTime) {
                 finalData.push(priority2Array[0]);
                 startTime = startTime + priority2Array[0].end;
                 data = data.filter(
@@ -297,8 +300,10 @@ const SimulationMM1Priority = ({
             const temp2 = { ...data[i] };
             temp2.arrivalTime = lastinter;
             temp2.service = temp2.service - temp.service;
-            temp2.end = temp2.arrivalTime + temp.service;
+            temp2.end = temp2.arrivalTime + temp2.service;
+            console.log(temp2, "temp2 priority12");
             finalData.push(temp2);
+            console.log(finalData);
             startTime = startTime + temp2.end;
           } else {
             console.log("priority11");
