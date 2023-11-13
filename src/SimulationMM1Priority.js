@@ -67,9 +67,10 @@ const SimulationMM1Priority = ({
     let Z = 10112166;
     for (let i = 1; i <= count; i++) {
       let interarrivalTime = Math.round(generateRandomTime(arrivalMean));
+      // interarrivalTime += 1;
       if (i == 1) {
         console.log("chk passs");
-        interarrivalTime = 0;
+        interarrivalTime = 1;
       }
       console.log(interarrivalTime);
       console.log(i == 1);
@@ -152,178 +153,282 @@ const SimulationMM1Priority = ({
       });
     }
     data = [...tempArray];
-    console.log(data, "daaatttaaa");
     if (data.length) {
       const calculatedData = [];
       let serverIdleTime = 0;
       let serverUtilizationTime = 0;
-      console.log(data);
-      const priority1Array = data.filter((e) => e.priority == 1);
-      const priority2Array = data.filter((e) => e.priority == 2);
-      const priority3Array = data.filter((e) => e.priority == 3);
+      const priority1Array = [...data.filter((e) => e.priority == 1)];
+      const priority2Array = [...data.filter((e) => e.priority == 2)];
+      const priority3Array = [...data.filter((e) => e.priority == 3)];
 
       let startTime = 0;
       let totalWaitTime = 0;
       let totalTurnaroundTime = 0;
-      console.log(data);
-      console.log(priority1Array[0]);
-      console.log(priority2Array[0]);
-      console.log(priority3Array[0]);
-      console.log(priority3Array[0]);
       let finalData = [];
       for (var i = 0; i < data.length; i++) {
-        // console.log(data[i].end);
         if (data[i].priority == 3) {
           console.log("priority3");
+          console.log(finalData, "bbbb");
           finalData.push(data[i]);
-          startTime = startTime + data[i].end;
+          startTime =
+            Math.max(data[i].arrivalTime, startTime) + data[i].serviceTime;
           priority3Array.shift();
+          console.log(finalData, "bbbbaaaa");
         } else if (data[i].priority == 2) {
           console.log("priority2");
-          
-          if (data[i].end >= priority3Array[0]?.arrivalTime) {
-            console.log("priority23");
-            const temp = { ...data[i] };
-            temp.end = priority3Array[0].arrivalTime;
-            temp.service = temp.end - temp.arrivalTime;
-            startTime = startTime + temp.end;
-            console.log(temp, "temp priority23");
-            finalData.push(temp);
-            let lastinter;
-            while (startTime >= priority3Array[0]?.arrivalTime) {
-              finalData.push(priority3Array[0]);
+          // let temp1interarrival;
+          let tempP2Array = [];
+          let isLoop = false;
+          let temp1 = { ...data[i] };
+          let temp2 = { ...data[i] };
+          console.log(priority3Array[0]?.arrivalTime);
+          console.log(startTime + data[i].serviceTime + 1);
+          while (
+            startTime + data[i].serviceTime + 1 >=
+            priority3Array[0]?.arrivalTime
+          ) {
+            isLoop = true;
+            tempP2Array.push(priority3Array[0]);
+            startTime =
+              Math.max(priority3Array.arrivalTime, startTime) +
+              priority3Array.serviceTime;
+            data = data.filter((e) => e.customer != priority3Array[0].customer);
+            priority3Array.shift();
+            console.log(finalData);
+          }
+          if (isLoop) {
+            temp1.end = tempP2Array[0]?.arrivalTime;
+            temp1.serviceTime = temp1.end - temp1.arrivalTime;
+            temp2.arrivalTime = tempP2Array[tempP2Array.length - 1]?.end;
+            console.log(tempP2Array[-1]);
+            temp2.serviceTime = temp2.serviceTime - temp1.serviceTime;
+            temp2.end = temp2.arrivalTime + temp2.serviceTime;
+            finalData.push(temp1);
+            finalData.push(...tempP2Array);
+            finalData.push(temp2);
+            startTime =
+              Math.max(temp1.arrivalTime, startTime) + temp1.serviceTime;
+            startTime =
+              Math.max(temp2.arrivalTime, startTime) + temp2.serviceTime;
+            priority2Array.shift();
+          } else {
+            finalData.push(data[i]);
+            startTime =
+              Math.max(data[i].arrivalTime, startTime) + data[i].serviceTime;
+            priority2Array.shift();
+
+            console.log("yesss");
+          }
+          console.log(finalData);
+
+          // if (data[i].end > priority3Array[0]?.arrivalTime) {
+          //   console.log("priority23");
+          //   console.log(priority3Array[0]);
+          //   const temp = { ...data[i] };
+          //   temp.end = priority3Array[0].arrivalTime;
+          //   temp.serviceTime = temp.end - temp.arrivalTime;
+          //   startTime = temp.end;
+          //   console.log(temp, "temp priority23");
+          //   finalData.push(temp);
+          //   let lastinter;
+          //   while (startTime >= priority3Array[0]?.arrivalTime) {
+          //     finalData.push(priority3Array[0]);
+          //     data = data.filter(
+          //       (e) => e.customer != priority3Array[0].customer
+          //     );
+          //     lastinter = priority3Array[0]?.end;
+          //     console.log([...priority3Array], "priority3Array before 23");
+          //     startTime = priority3Array[0]?.end;
+          //     priority3Array.shift();
+          //     console.log([...priority3Array], "priority3Array after 23");
+          //   }
+          //   const temp2 = { ...data[i] };
+          //   temp2.arrivalTime = lastinter;
+          //   temp2.serviceTime = temp2.serviceTime - temp.serviceTime;
+          //   temp2.end = temp2.arrivalTime + temp2.serviceTime;
+          //   startTime = temp2.end;
+          //   // console.log([...temp2], "temp priority23");
+          //   finalData.push(temp2);
+          //   priority2Array.shift();
+          // } else {
+          //   console.log("priority22");
+          //   finalData.push(data[i]);
+          //   startTime = data[i].end;
+          //   console.log([...priority2Array], "priority2Array after 22");
+          //   priority2Array.shift();
+          //   console.log([...priority2Array], "priority2Array after 22");
+          // }
+        } else if (data[i].priority == 1) {
+          console.log("priority1");
+          let tempP2Array = [];
+          let isLoop = false;
+          let temp1 = { ...data[i] };
+          let temp2 = { ...data[i] };
+          while (
+            startTime + data[i].serviceTime + 1 >=
+              priority3Array[0]?.arrivalTime ||
+            startTime + data[i].serviceTime + 1 >=
+              priority2Array[0]?.arrivalTime
+          ) {
+            isLoop = true;
+            if (
+              startTime + data[i].serviceTime + 1 >=
+              priority3Array[0]?.arrivalTime
+            ) {
+              tempP2Array.push(priority3Array[0]);
+              startTime =
+                Math.max(priority3Array.arrivalTime, startTime) +
+                priority3Array.serviceTime;
               data = data.filter(
                 (e) => e.customer != priority3Array[0].customer
               );
-              lastinter = priority3Array[0]?.end;
-              console.log(priority3Array, "priority3Array before 23");
-              startTime = startTime + priority3Array[0]?.end;
               priority3Array.shift();
-              console.log(priority3Array, "priority3Array after 23");
-            }
-            const temp2 = { ...data[i] };
-            temp2.arrivalTime = lastinter;
-            temp2.service = temp2.service - temp.service;
-            temp2.end = temp2.arrivalTime + temp.service;
-            startTime = startTime + temp2.end;
-            console.log(temp2, "temp priority23");
-            finalData.push(temp2);
-            priority2Array.shift();
-          } else {
-            console.log("priority22");
-            finalData.push(data[i]);
-            startTime = startTime + data[i].end;
-            console.log(priority2Array, "priority2Array after 22");
-            priority2Array.shift();
-            console.log(priority2Array, "priority2Array after 22");
-          }
-        } else if (data[i].priority == 1) {
-          console.log("priority1");
-          if (data[i].end >= priority3Array[0]?.arrivalTime) {
-            console.log("priority13");
-            const temp = { ...data[i] };
-            temp.end = priority3Array[0].arrivalTime;
-            temp.service = temp.end - temp.arrivalTime;
-            console.log(temp, "temp priority13");
-            finalData.push(temp);
-            startTime = startTime + temp.end;
-            let lastinter;
-            while (
-              startTime >= priority3Array[0]?.arrivalTime ||
-              startTime >= priority2Array[0]?.arrivalTime
+            } else if (
+              startTime + data[i].serviceTime + 1 >=
+              priority2Array[0]?.arrivalTime
             ) {
-              if (startTime >= priority3Array[0]?.arrivalTime) {
-                finalData.push(priority3Array[0]);
-                startTime = startTime + priority3Array[0].end;
-                data = data.filter(
-                  (e) => e.customer != priority3Array[0].customer
-                );
-                lastinter = priority3Array[0]?.end;
-                priority3Array.shift();
-              } else if (startTime >= priority2Array[0]?.arrivalTime) {
-                finalData.push(priority2Array[0]);
-                startTime = startTime + priority2Array[0].end;
-                data = data.filter(
-                  (e) => e.customer != priority2Array[0].customer
-                );
-                lastinter = priority2Array[0]?.end;
-                console.log(priority2Array, "priority2Array before 12");
-                priority2Array.shift();
-                console.log(priority2Array, "priority2Array after 12");
-              }
+              tempP2Array.push(priority2Array[0]);
+              startTime =
+                Math.max(priority2Array.arrivalTime, startTime) +
+                priority2Array.serviceTime;
+              data = data.filter(
+                (e) => e.customer != priority2Array[0].customer
+              );
+              priority2Array.shift();
             }
-            const temp2 = { ...data[i] };
-            temp2.arrivalTime = lastinter;
-            temp2.service = temp2.service - temp.service;
-            temp2.end = temp2.arrivalTime + temp2.service;
-            console.log(temp2, "temp2 priority23");
-            finalData.push(temp2);
-            startTime = startTime + temp2.end;
-            console.log(priority2Array, "priority2Array before 13");
-            priority1Array.shift();
-            console.log(priority2Array, "priority2Array after 13");
-
-            // }
-          } else if (data[i].end >= priority2Array[0]?.arrivalTime) {
-            console.log("priority12");
-            let temp = { ...data[i] };
-            temp.end = priority2Array[0]?.arrivalTime;
-            temp.service = temp.end - temp.arrivalTime;
-            console.log(temp, "temp priority121111");
-            finalData.push(temp);
-            startTime = startTime + temp.end;
-            let lastinter;
-            while (
-              startTime >= priority3Array[0]?.arrivalTime ||
-              startTime >= priority2Array[0]?.arrivalTime
-            ) {
-              if (startTime >= priority3Array[0]?.arrivalTime) {
-                finalData.push(priority3Array[0]);
-                startTime = startTime + priority3Array[0].end;
-                data = data.filter(
-                  (e) => e.customer != priority3Array[0].customer
-                );
-                lastinter = priority3Array[0]?.end;
-                priority3Array.shift();
-              } else if (startTime >= priority2Array[0]?.arrivalTime) {
-                finalData.push(priority2Array[0]);
-                startTime = startTime + priority2Array[0].end;
-                data = data.filter(
-                  (e) => e.customer != priority2Array[0].customer
-                );
-                lastinter = priority2Array[0]?.end;
-                console.log(priority2Array, "priority2Array before 12");
-                priority2Array.shift();
-                console.log(priority2Array, "priority2Array after 12");
-              }
-            }
-            const temp2 = { ...data[i] };
-            temp2.arrivalTime = lastinter;
-            temp2.service = temp2.service - temp.service;
-            temp2.end = temp2.arrivalTime + temp2.service;
-            console.log(temp2, "temp2 priority12");
-            finalData.push(temp2);
             console.log(finalData);
-            startTime = startTime + temp2.end;
-          } else {
-            console.log("priority11");
-            finalData.push(data[i]);
-            startTime = startTime + data[i].end;
-            console.log(priority1Array, "priority1Array before 11");
-            priority1Array.shift();
-            console.log(priority1Array, "priority1Array after 11");
           }
+          if (isLoop) {
+            temp1.end = tempP2Array[0]?.arrivalTime;
+            temp1.serviceTime = temp1.end - temp1.arrivalTime;
+            temp2.arrivalTime = tempP2Array[tempP2Array.length - 1]?.end;
+            console.log(tempP2Array[-1]);
+            temp2.serviceTime = temp2.serviceTime - temp1.serviceTime;
+            temp2.end = temp2.arrivalTime + temp2.serviceTime;
+            finalData.push(temp1);
+            startTime =
+              Math.max(temp1.arrivalTime, startTime) + temp1.serviceTime;
+            startTime =
+              Math.max(temp2.arrivalTime, startTime) + temp2.serviceTime;
+            finalData.push(...tempP2Array);
+            // finalData = [...tempP2Array];
+            finalData.push(temp2);
+          } else {
+            finalData.push(data[i]);
+            startTime =
+              Math.max(data[i].arrivalTime, startTime) + data[i].serviceTime;
+          }
+          console.log(finalData);
+
+          // if (data[i].end > priority3Array[0]?.arrivalTime) {
+          //   console.log("priority13");
+          //   const temp = { ...data[i] };
+          //   temp.end = priority3Array[0].arrivalTime;
+          //   temp.serviceTime = temp.end - temp.arrivalTime;
+          //   console.log(temp, "temp priority13");
+          //   finalData.push(temp);
+          //   startTime = temp.end;
+          //   let lastinter;
+          //   while (
+          //     startTime >= priority3Array[0]?.arrivalTime ||
+          //     startTime >= priority2Array[0]?.arrivalTime
+          //   ) {
+          //     if (startTime >= priority3Array[0]?.arrivalTime) {
+          //       finalData.push(priority3Array[0]);
+          //       // startTime = priority3Array[0].end;
+          //       data = data.filter(
+          //         (e) => e.customer != priority3Array[0].customer
+          //       );
+          //       lastinter = priority3Array[0]?.end;
+          //       priority3Array.shift();
+          //     } else if (startTime >= priority2Array[0]?.arrivalTime) {
+          //       finalData.push(priority2Array[0]);
+          //       // startTime = priority2Array[0].end;
+          //       data = data.filter(
+          //         (e) => e.customer != priority2Array[0].customer
+          //       );
+          //       lastinter = priority2Array[0]?.end;
+          //       console.log([...priority2Array], "priority2Array before 12");
+          //       priority2Array.shift();
+          //       console.log([...priority2Array], "priority2Array after 12");
+          //     }
+          //   }
+          //   const temp2 = { ...data[i] };
+          //   temp2.arrivalTime = lastinter;
+          //   temp2.serviceTime = temp2.serviceTime - temp.serviceTime;
+          //   temp2.end = temp2.arrivalTime + temp2.serviceTime;
+          //   // console.log([...temp2], "temp2 priority23");
+          //   finalData.push(temp2);
+          //   startTime = temp2.end;
+          //   console.log([...priority2Array], "priority2Array before 13");
+          //   priority1Array.shift();
+          //   console.log([...priority2Array], "priority2Array after 13");
+
+          //   // }
+          // } else if (data[i].end > priority2Array[0]?.arrivalTime) {
+          //   console.log("priority12");
+          //   let temp = { ...data[i] };
+          //   temp.end = priority2Array[0]?.arrivalTime;
+          //   temp.serviceTime = temp.end - temp.arrivalTime;
+          //   console.log(temp, "temp priority121111");
+          //   finalData.push(temp);
+          //   startTime = temp.end;
+          //   let lastinter;
+          //   while (
+          //     startTime >= priority3Array[0]?.arrivalTime ||
+          //     startTime >= priority2Array[0]?.arrivalTime
+          //   ) {
+          //     if (startTime >= priority3Array[0]?.arrivalTime) {
+          //       finalData.push(priority3Array[0]);
+          //       // startTime = priority3Array[0].end;
+          //       data = data.filter(
+          //         (e) => e.customer != priority3Array[0].customer
+          //       );
+          //       lastinter = priority3Array[0]?.end;
+          //       priority3Array.shift();
+          //     } else if (startTime >= priority2Array[0]?.arrivalTime) {
+          //       finalData.push(priority2Array[0]);
+          //       // startTime = priority2Array[0].end;
+          //       data = data.filter(
+          //         (e) => e.customer != priority2Array[0].customer
+          //       );
+          //       lastinter = priority2Array[0]?.end;
+          //       console.log([...priority2Array], "priority2Array before 12");
+          //       priority2Array.shift();
+          //       console.log([...priority2Array], "priority2Array after 12");
+          //     }
+          //   }
+          //   const temp2 = { ...data[i] };
+          //   console.log(data[i], "chk temp2");
+          //   temp2.arrivalTime = lastinter;
+          //   temp2.serviceTime = temp2.serviceTime - temp.serviceTime;
+          //   temp2.end = temp2.arrivalTime + temp2.serviceTime;
+          //   console.log(temp2, "temp2 priority12");
+          //   finalData.push(temp2);
+          //   console.log(finalData);
+          //   startTime = temp2.end;
+          // } else {
+          //   console.log("priority11");
+          //   finalData.push(data[i]);
+          //   startTime = data[i].end;
+          //   console.log([...priority1Array], "priority1Array before 11");
+          //   priority1Array.shift();
+          //   console.log([...priority1Array], "priority1Array after 11");
+          // }
         }
       }
       startTime = 0;
-      // finalData = finalData.filter((v) => v.service >= 0);
-      console.log(finalData, "11111");
+      finalData = finalData.filter((v) => v.serviceTime > 0);
+      // console.log(finalData, "11111");
       for (let i = 0; i < finalData.length; i++) {
         const { customer, interarrivalTime, arrivalTime, serviceTime } =
           finalData[i];
         const endTime = Math.max(arrivalTime, startTime) + serviceTime;
-        console.log(startTime, 111111);
-        const waitTime = Math.max(1, startTime - arrivalTime);
+        // console.log(startTime, 111111);
+        const waitTime = Math.max(1, startTime - arrivalTime) - 1;
+        // const waitTime = startTime - arrivalTime;
+        // console.log(startTime);
+        // console.log(arrivalTime);
         // const waitTime =endTime-startTime-serviceTime;
         const turnaroundTime = waitTime + serviceTime;
         calculatedData.push({
@@ -333,7 +438,7 @@ const SimulationMM1Priority = ({
           serviceTime,
           startTime: Math.max(arrivalTime, startTime),
           endTime,
-          waitTime: waitTime - 1,
+          waitTime: i == 0 ? 0 : waitTime,
           turnaroundTime,
         });
 
